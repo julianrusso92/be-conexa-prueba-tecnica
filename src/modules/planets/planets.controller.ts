@@ -1,23 +1,21 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { QueryDto } from 'src/common/query.dto';
 import { PlanetsService } from './planets.service';
-import { ApiTags } from '@nestjs/swagger';
-
+import { FilmDto, FilmsDto } from '../films/dto';
 @Controller('planets')
 @ApiTags('planets')
 export class PlanetsController {
   constructor(private readonly planetsService: PlanetsService) {}
-
   @Get()
-  async findAll() {
-    const result = await this.planetsService.findAll();
-    console.log(
-      '🚀 ~ file: planets.controller.ts:13 ~ PlanetsController ~ findAll ~ result:',
-      result,
-    );
-    return result;
+  @ApiOkResponse({ type: FilmsDto })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async findAll(@Query() query: QueryDto) {
+    return this.planetsService.findAll(query);
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: FilmDto })
   findOne(@Param('id') id: string) {
     return this.planetsService.findOne(+id);
   }

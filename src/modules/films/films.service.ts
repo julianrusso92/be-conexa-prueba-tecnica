@@ -2,6 +2,9 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { fetchData } from 'src/common/http.utils';
+import { QueryDto } from 'src/common/query.dto';
+import { FilmsDto } from './dto/films.dto';
+import { FilmDto } from './dto/film.dto';
 
 @Injectable()
 export class FilmsService {
@@ -13,10 +16,25 @@ export class FilmsService {
   }
 
   private readonly baseUrlSwapi: string;
-  async findAll() {
-    return fetchData(this.httpService, `${this.baseUrlSwapi}/films`);
+
+  async findAll(query: QueryDto) {
+    let url = `${this.baseUrlSwapi}/films/`;
+    const { search, page } = query;
+
+    if (search) {
+      url += `?search=${search}`;
+    }
+
+    if (page) {
+      url += `${search ? '&' : '?'}page=${page}`;
+    }
+
+    return fetchData<FilmsDto>(this.httpService, url);
   }
-  async findOne(id: number) {
-    return fetchData(this.httpService, `${this.baseUrlSwapi}/films/${id}`);
+  findOne(id: number) {
+    return fetchData<FilmDto>(
+      this.httpService,
+      `${this.baseUrlSwapi}/films/${id}`,
+    );
   }
 }
